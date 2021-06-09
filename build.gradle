@@ -1,5 +1,5 @@
 plugins {
-	id 'org.springframework.boot' version '2.4.4'
+	id 'org.springframework.boot' version '2.5.0'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
 }
@@ -13,26 +13,27 @@ repositories {
 	maven { url 'https://repo.spring.io/snapshot' }
 }
 
+configurations.all {
+	resolutionStrategy.eachDependency { details ->
+		if (details.requested.group == 'io.projectreactor.netty') {
+			details.useVersion "1.0.8-SNAPSHOT"
+		}
+	}
+}
+
 ext {
-	set('springCloudVersion', "2020.0.2")
+	set('springCloudVersion', "2020.0.3")
+	set('logbookVersion', "2.9.0")
 }
 
 dependencies {
-	compile ("io.projectreactor.netty:reactor-netty:1.0.6-SNAPSHOT") {
-		force = true
-	}
-
-	compile ("io.projectreactor.netty:reactor-netty-http:1.0.6-SNAPSHOT") {
-		force = true
-	}
-
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.cloud:spring-cloud-starter-sleuth'
+	implementation 'io.projectreactor.netty:reactor-netty-http-brave'
+	implementation "org.zalando:logbook-spring-boot-webflux-autoconfigure"
 
 	compileOnly "org.projectlombok:lombok"
 	annotationProcessor "org.projectlombok:lombok"
-
-	implementation "org.zalando:logbook-spring-boot-webflux-autoconfigure:2.6.1"
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
@@ -41,6 +42,7 @@ dependencies {
 dependencyManagement {
 	imports {
 		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+		mavenBom "org.zalando:logbook-bom:${logbookVersion}"
 	}
 }
 
